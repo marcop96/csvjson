@@ -20,22 +20,25 @@ const testJSON = ref([
     City: "Chicago",
   },
 ]);
-const convertToCSV = (json: any) => {
+const convertToCSV = (json: string) => {
+  const convertedJSON = JSON.parse(json);
+  // if (convertedJSON.isArray === false) {
+  //   wrappedJSON.push(convertedJSON);
+  // }
   if (json.length === 0) {
     return console.error("text area cannot be empty");
   }
-  const headers = Object.keys(json[0]);
+
   const values = ref("");
   // console.log(Object.values(json[0]));
 
-  for (let i = 0; i < Object.keys(json).length; i++) {
-    console.log(Object.values(json[i]));
-    values.value += Object.values(json[i]).join("\n");
-
-    console.log(values.value);
+  for (let i = 0; i < Object.keys(convertedJSON).length; i++) {
+    console.log(Object.values(convertedJSON[i]));
+    values.value += Object.values(convertedJSON[i]).join("\n");
   }
-  outputText.value += headers;
+  outputText.value = Object.keys(convertedJSON[0]);
   outputText.value += values.value;
+  console.log(outputText.value);
 };
 </script>
 
@@ -60,7 +63,7 @@ const convertToCSV = (json: any) => {
     </div>
     <button
       class="w-fit h-12 bg-black text-white rounded-lg p-2 m-2"
-      @click="convertToCSV(testJSON)"
+      @click="convertToCSV(rawText)"
     >
       CONVERT
     </button>
