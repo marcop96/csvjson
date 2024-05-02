@@ -25,11 +25,17 @@ const convertToCSV = (json: any) => {
     return console.error("text area cannot be empty");
   }
   const headers = Object.keys(json[0]);
-
+  const values = ref("");
   // console.log(Object.values(json[0]));
-  json.forEach((object) => {
-    console.log(console.log(object));
-  });
+
+  for (let i = 0; i < Object.keys(json).length; i++) {
+    console.log(Object.values(json[i]));
+    values.value += Object.values(json[i]).join("\n");
+
+    console.log(values.value);
+  }
+  outputText.value += headers;
+  outputText.value += values.value;
 };
 </script>
 
