@@ -3,42 +3,30 @@ import { ref } from "vue";
 
 const rawText = ref("");
 const outputText = ref("");
-const testJSON = ref([
-  {
-    Name: "John Doe",
-    Age: 35,
-    City: "New York",
-  },
-  {
-    Name: "Jane Smith",
-    Age: 28,
-    City: "Los Angeles",
-  },
-  {
-    Name: "Michael Johnson",
-    Age: 42,
-    City: "Chicago",
-  },
-]);
+let converted;
+
 const convertToCSV = (json: string) => {
-  const convertedJSON = JSON.parse(json);
-  // if (convertedJSON.isArray === false) {
-  //   wrappedJSON.push(convertedJSON);
-  // }
   if (json.length === 0) {
     return console.error("text area cannot be empty");
   }
 
-  const values = ref("");
-  // console.log(Object.values(json[0]));
-
-  for (let i = 0; i < Object.keys(convertedJSON).length; i++) {
-    console.log(Object.values(convertedJSON[i]));
-    values.value += Object.values(convertedJSON[i]).join("\n");
+  try {
+    converted = JSON.parse(json);
+  } catch (error) {
+    console.error(error);
+    return;
   }
-  outputText.value = Object.keys(convertedJSON[0]);
+
+  const values = ref("");
+
+  values.value += Object.keys(converted[0]);
+  values.value += "\n";
+
+  converted.forEach((item: any) => {
+    values.value += Object.values(item).join(",");
+    values.value += "\n";
+  });
   outputText.value += values.value;
-  console.log(outputText.value);
 };
 </script>
 
