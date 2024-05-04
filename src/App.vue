@@ -1,7 +1,5 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
-const testText =
-  '{ "name": "John Doe", "age": 35, "email": "john.doe@example.com", "address": { "street": "123 Main St", "city": "Anytown", "state": "CA", "zip": "12345" }, "hobbies": ["reading", "hiking", "photography"] }';
 const rawText = ref("");
 const outputText = ref("");
 let converted;
@@ -73,7 +71,7 @@ const convertToCSV = (json: string) => {
     </div>
     <button
       class="w-fit h-12 bg-black text-white rounded-lg p-2 m-2"
-      @click="convertToCSV(testText)"
+      @click="convertToCSV(rawText)"
     >
       CONVERT
     </button>
