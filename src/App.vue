@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
-
+const testText =
+  '{ "name": "John Doe", "age": 35, "email": "john.doe@example.com", "address": { "street": "123 Main St", "city": "Anytown", "state": "CA", "zip": "12345" }, "hobbies": ["reading", "hiking", "photography"] }';
 const rawText = ref("");
 const outputText = ref("");
 let converted;
@@ -8,6 +9,8 @@ const hasError = computed(
   () => outputText.value === "" || outputText.value === "undefined"
 );
 const convertToCSV = (json: string) => {
+  outputText.value = "";
+
   if (json.length === 0) {
     return console.error("text area cannot be empty");
   }
@@ -17,21 +20,27 @@ const convertToCSV = (json: string) => {
   } catch (error) {
     return console.error(error);
   }
-  let headers;
-  let rows;
-  if (Array.isArray(converted)) {
-    headers = Object.keys(converted[0]);
-    rows = converted.map((item: any) => Object.values(item));
-    outputText.value = [headers, ...rows]
-      .map((row) => row.join(","))
-      .join("\n");
-  } else {
-    headers = Object.keys(converted);
-    rows = [Object.values(converted)];
-    outputText.value = [headers, ...rows]
-      .map((row) => row.join(","))
-      .join("\n");
-  }
+
+  const flattenObject = (obj: object, prefix = "") => {
+    const result = {};
+    for (const key in obj) {
+      const value = obj[key];
+      const newKey = prefix ? `${prefix}.${key}` : key;
+      if (typeof value === "object" && value !== null) {
+        Object.assign(result, flattenObject(value, newKey));
+      } else {
+        result[newKey] = value as string;
+      }
+    }
+    return result;
+  };
+
+  const flattenedObject = flattenObject(converted);
+
+  let headers = Object.keys(flattenedObject);
+  let rows = [Object.values(flattenedObject)];
+
+  outputText.value = [headers, ...rows].map((row) => row.join(",")).join("\n");
 };
 </script>
 
@@ -64,7 +73,7 @@ const convertToCSV = (json: string) => {
     </div>
     <button
       class="w-fit h-12 bg-black text-white rounded-lg p-2 m-2"
-      @click="convertToCSV(rawText)"
+      @click="convertToCSV(testText)"
     >
       CONVERT
     </button>
