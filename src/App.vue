@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { computed, ref } from "vue";
 
 const rawText = ref("");
 const outputText = ref("");
 let converted;
-
+const hasError = computed(
+  () => outputText.value === "" || outputText.value === "undefined"
+);
 const convertToCSV = (json: string) => {
   if (json.length === 0) {
     return console.error("text area cannot be empty");
@@ -13,20 +15,23 @@ const convertToCSV = (json: string) => {
   try {
     converted = JSON.parse(json);
   } catch (error) {
-    console.error(error);
-    return;
+    return console.error(error);
   }
-
-  const values = ref("");
-
-  values.value += Object.keys(converted[0]);
-  values.value += "\n";
-
-  converted.forEach((item: any) => {
-    values.value += Object.values(item).join(",");
-    values.value += "\n";
-  });
-  outputText.value += values.value;
+  let headers;
+  let rows;
+  if (Array.isArray(converted)) {
+    headers = Object.keys(converted[0]);
+    rows = converted.map((item: any) => Object.values(item));
+    outputText.value = [headers, ...rows]
+      .map((row) => row.join(","))
+      .join("\n");
+  } else {
+    headers = Object.keys(converted);
+    rows = [Object.values(converted)];
+    outputText.value = [headers, ...rows]
+      .map((row) => row.join(","))
+      .join("\n");
+  }
 };
 </script>
 
@@ -39,7 +44,15 @@ const convertToCSV = (json: string) => {
         <h3 class="w-fit text-xl font-bold text-center">
           Paste your JSON data here
         </h3>
-        <textarea class="p-8 w-96 h-96 shadow-lg" v-model="rawText"></textarea>
+        <textarea
+          class="p-8 w-96 h-96 shadow-lg"
+          v-model="rawText"
+          :class="[
+            hasError
+              ? 'outline-red-500 outline-2'
+              : 'outline-green-500 outline-2',
+          ]"
+        ></textarea>
       </div>
       <div class="w-96">
         <h3 class="w-fit text-xl font-bold text-center">Here's your result</h3>
