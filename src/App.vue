@@ -19,15 +19,16 @@ const convertToCSV = (json: string) => {
     return console.error(error);
   }
 
-  const flattenObject = (obj: object, prefix = "") => {
-    const result = {};
+  const flattenObject = (obj: { [key: string]: any }, prefix: string = "") => {
+    const result: { [key: string]: any } = {};
     for (const key in obj) {
+      if (!Object.prototype.hasOwnProperty.call(obj, key)) continue;
       const value = obj[key];
       const newKey = prefix ? `${prefix}.${key}` : key;
       if (typeof value === "object" && value !== null) {
         Object.assign(result, flattenObject(value, newKey));
       } else {
-        result[newKey] = value as string;
+        result[newKey] = value;
       }
     }
     return result;
